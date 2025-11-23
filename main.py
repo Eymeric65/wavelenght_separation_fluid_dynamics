@@ -141,10 +141,13 @@ if __name__ == '__main__':
     first_zone_x = [0, 100]
     second_zone_x = [200, 500]
 
-    eps_dbscan = 0.55
+    eps_dbscan = 0.5
 
-    cutoff_radius = 35  # Example cutoff radius in pixels
-    feature_bin_count= 60  # Number of bins for feature extraction
+    cutoff_radius = 40  # Example cutoff radius in pixels
+    feature_bin_count= 30  # Number of bins for feature extraction
+
+    # What zone to consider for clustering [0]: first zone, [1]: second zone, [0,1]: both zones
+    influence_zone= [0,1]
 
     dbscan_min_samples = 5
 
@@ -232,8 +235,6 @@ if __name__ == '__main__':
     radial_bins_second = []
     radial_profile_second = []
 
-
-
     bin_edges = np.linspace(0, cutoff_radius, feature_bin_count + 1)
 
     feature_vec_f = np.zeros((feature_bin_count, mag_fft_first_zone.shape[2]))
@@ -269,8 +270,12 @@ if __name__ == '__main__':
     feature_vec_s_norm = feature_vec_s / np.linalg.norm(feature_vec_s, axis=0, keepdims=True)   
 
     # Concatenate feature vectors from both zones
-    combined_features = np.vstack((feature_vec_f_norm, feature_vec_s_norm)).T
-
+    if influence_zone == [0]:
+        combined_features = feature_vec_f_norm.T
+    elif influence_zone == [1]:
+        combined_features = feature_vec_s_norm.T
+    else:
+        combined_features = np.vstack((feature_vec_f_norm, feature_vec_s_norm)).T
     # # Concatenate feature vectors from both zones
     # combined_features = np.vstack((feature_vec_f, feature_vec_s)).T
     # combined_features = combined_features / np.linalg.norm(combined_features, axis=1, keepdims=True)
